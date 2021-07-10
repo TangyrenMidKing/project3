@@ -10,18 +10,31 @@
 symbol *table;
 int sym_index;
 int error;
+lexeme* current_token;
 
+// prototypes
 void printtable();
 void errorend(int x);
+void enter();
+void program();
+void block();
+void const_decl();
+void var_decl();
+void proc_decl();
+void statement();
 
 symbol *parse(lexeme *input)
 {
 	table = malloc(1000 * sizeof(symbol));
 	sym_index = 0;
 	error = 0;
+	current_token = input;
+// 	current_token += 1;
+// printf("Start here: %6s %3d %3d\n", input[1].name, input[1].value, input[1].type);
+// if (current_token->type == periodsym)
+//  printf("Start here: %6s %3d %3d\n", current_token->name, current_token->value, current_token->type);
 
-	printf("%s\n", input[1].name);
-
+	program();
 
 	if (error)
 	{
@@ -33,6 +46,107 @@ symbol *parse(lexeme *input)
 		printtable();
 		return table;
 	}
+}
+
+void get_token()
+{
+	// Input is empty.
+	if (current_token == NULL)
+	{
+		errorend(0);
+		exit(1);
+	}
+
+	current_token = current_token + 1;
+}
+
+void program()
+{
+	if (error == 0)
+	{
+		get_token();
+
+		block();
+
+		if (current_token->type != periodsym)
+		{
+			errorend(3);
+			exit(1);
+		}
+	}
+	else
+	{
+		errorend(0);
+		exit(1);
+	}
+}
+
+void block()
+{
+	if (current_token->type == constsym)
+		const_decl();
+	if (current_token->type == varsym)
+		var_decl();
+	if (current_token->type == procsym)
+		proc_decl();
+
+	statement();
+}
+
+void const_decl()
+{
+	while (current_token->type != commasym)
+	{
+		get_token();
+
+		if (current_token->type != identsym)
+		{
+			/**Bug here**/
+			errorend(4);
+			exit(1);
+		}
+
+		get_token();
+
+		if(current_token->type != eqlsym)
+		{
+			errorend(4);
+			exit(1);
+		}
+
+		get_token();
+
+		if(current_token->type != numbersym)
+		{
+			errorend(5);
+			exit(1);
+		}
+		/**Uncompleted**/
+		enter();
+		get_token();
+	}
+
+	if (current_token->type != semicolonsym)
+	{
+		errorend(6);
+		exit(1);
+	}
+	get_token();
+}
+
+void var_decl()
+{
+
+}
+
+void proc_decl()
+{
+
+}
+
+void statement()
+{
+
 }
 
 void errorend(int x)
