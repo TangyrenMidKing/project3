@@ -7,4 +7,4 @@ Jiahao Zhu
 
 # Command Instruction
 $ gcc driver.c lex.o parser.c -o driver
-$ ./driver parserexample1.txt
+$ ./driver input_file_name.txt
