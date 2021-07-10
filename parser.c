@@ -28,6 +28,7 @@ void term();
 void factor();
 int isMultOp(token_type sym);
 int isRelation(token_type sym);
+void enter();
 
 symbol *parse(lexeme *input)
 {
