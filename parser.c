@@ -19,7 +19,10 @@ symbol *parse(lexeme *input)
 	table = malloc(1000 * sizeof(symbol));
 	sym_index = 0;
 	error = 0;
-	
+
+	printf("%s\n", input[1].name);
+
+
 	if (error)
 	{
 		free(table);
@@ -82,7 +85,7 @@ void errorend(int x)
 			printf("Implementation Error: Unrecognized Error Code\n");
 			break;
 	}
-	
+
 }
 
 void printtable()
@@ -92,5 +95,5 @@ void printtable()
 	printf("Kind | Name        | Value | Level | Address\n");
 	printf("------------------------------------------------------\n");
 	for (i = 0; i < sym_index; i++)
-		printf("%4d | %11s | %5d | %5d\n", table[i].kind, table[i].name, table[i].value, table[i].level, table[i].addr); 
+		printf("%4d | %11s | %5d | %5d | %5d\n", table[i].kind, table[i].name, table[i].val, table[i].level, table[i].addr);
 }

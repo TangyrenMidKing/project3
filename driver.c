@@ -15,17 +15,17 @@ int main(int argc, char **argv)
 	lexeme *list;
 	symbol *table;
 	int i;
-	
+
 	if (argc < 2)
 	{
 		printf("Error : please include the file name");
 		return 0;
 	}
-	
+
 	ifp = fopen(argv[1], "r");
 	inputfile = malloc(500 * sizeof(char));
 	i = 0;
-	
+
 	c = fgetc(ifp);
 	while (1)
 	{
@@ -35,14 +35,14 @@ int main(int argc, char **argv)
 			break;
 	}
 	inputfile[i] = '\0';
-	
+
 	list = lexanalyzer(inputfile);
 	if (list == NULL)
 	{
 		free(inputfile);
 		return 0;
 	}
-	
+
 	table = parse(list);
 	if (table == NULL)
 	{
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
 		free(list);
 		return 0;
 	}
-	
+
 	free(list);
 	free(inputfile);
 	return 0;
