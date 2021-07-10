@@ -22,6 +22,12 @@ void const_decl();
 void var_decl();
 void proc_decl();
 void statement();
+void expression();
+void condition();
+void term();
+void factor();
+int isMultOp(token_type sym);
+int isRelation(token_type sym);
 
 symbol *parse(lexeme *input)
 {
@@ -136,17 +142,231 @@ void const_decl()
 
 void var_decl()
 {
+	while (current_token->type != commasym)
+	{
+		get_token();
+		if (current_token->type != identsym)
+		{
+			/**Bug here**/
+			errorend(4);
+			exit(1);
+		}
+		get_token();
+		enter();
+	}
 
+	if (current_token->type != semicolonsym)
+	{
+		errorend(6);
+		exit(1);
+	}
+	get_token();
 }
 
 void proc_decl()
 {
+	while (current_token->type == procsym)
+	{
+		get_token();
+		if (current_token->type != identsym)
+		{
+			/**Bug here**/
+			errorend(4);
+			exit(1);
+		}
 
+		enter();
+		get_token();
+
+		if (current_token->type != semicolonsym)
+		{
+			errorend(6);
+			exit(1);
+		}
+
+		get_token();
+  	/** level +1 **/
+		block();
+
+		if (current_token->type != semicolonsym)
+		{
+			errorend(6);
+			exit(1);
+		}
+
+		get_token();
+	}
 }
 
 void statement()
 {
+	// Identifier
+	if (current_token->type == identsym)
+	{
+		get_token();
+		if (current_token->type != becomessym)
+		{
+			errorend(2);
+			exit(1);
+		}
+		get_token();
+		expression();
+	}
+	// Call
+	else if (current_token->type == callsym)
+	{
+		get_token();
+		if (current_token->type != identsym)
+		{
+			errorend(4);
+			exit(1);
+		}
+		get_token();
+	}
+	// begin
+	else if (current_token->type == beginsym)
+	{
+		get_token();
+		statement();
+		while (current_token->type == semicolonsym)
+		{
+			get_token();
+			statement();
+		}
+		if (current_token->type != endsym)
+		{
+			errorend(10);
+			exit(1);
+		}
+		get_token();
+	}
+	// if
+	else if (current_token->type == ifsym)
+	{
+		get_token();
+		condition();
+		if (current_token->type != thensym)
+		{
+			errorend(9);
+			exit(1);
+		}
+		get_token();
+		statement();
+	}
+	// While
+	else if (current_token->type == whilesym)
+	{
+		get_token();
+		condition();
+		if (current_token->type != dosym)
+		{
+			errorend(11);
+			exit(1);
+		}
+		get_token();
+		statement();
+	}
+	// Unknown error
+	else
+	{
+		errorend(0);
+		exit(1);
+	}
+}
 
+void condition()
+{
+	if (current_token->type == oddsym)
+	{
+		get_token();
+		expression();
+	}
+	else
+	{
+		expression();
+		if (!isRelation(current_token->type))
+		{
+			errorend(12);
+			exit(1);
+		}
+		get_token();
+		expression();
+	}
+}
+
+void expression()
+{
+	if (current_token->type == plussym || current_token->type == minussym)
+		get_token();
+	term();
+	while (current_token->type == plussym || current_token->type == minussym)
+	{
+		get_token();
+		term();
+	}
+}
+
+void term()
+{
+	factor();
+	while (isMultOp(current_token->type))
+	{
+		get_token();
+		factor();
+	}
+}
+
+void factor()
+{
+	if (current_token->type == identsym)
+		get_token();
+	else if (current_token->type == numbersym)
+		get_token();
+	else if (current_token->type == lparentsym)
+	{
+		get_token();
+		expression();
+		if (current_token->type != rparentsym)
+		{
+			errorend(13);
+			exit(1);
+		}
+		get_token();
+	}
+	else
+	{
+		errorend(4);
+		exit(1);
+	}
+}
+
+int isMultOp(token_type mult_sym)
+{
+	if (mult_sym == multsym)
+		return 1;
+	else if (mult_sym == modsym)
+		return 1;
+	else if (mult_sym == slashsym)
+		return 1;
+	return 0;
+}
+
+int isRelation(token_type rela_sym)
+{
+	if (rela_sym == eqlsym)
+		return 1;
+	else if (rela_sym == neqsym)
+		return 1;
+	else if (rela_sym == lessym)
+		return 1;
+	else if (rela_sym == leqsym)
+		return 1;
+	else if (rela_sym == gtrsym)
+		return 1;
+	else if (rela_sym == geqsym)
+		return 1;
+	else
+		return 0;
 }
 
 void errorend(int x)
